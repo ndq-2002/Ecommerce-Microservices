@@ -7,6 +7,7 @@ using ECommerce.Infrastructure.Models;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,7 +25,7 @@ namespace ECommerce.Companies.Infrastructure.Services
         {
             return await _companyRepository.GetAllAsync();
         }
-        public async Task<ActionResultResponse<string>> InsertAsync(string creatorId, string creatorFullName, string creatorAvatar, CompanyMeta companyMeta)
+        public async Task<ActionResultResponse<string>> InsertAsync(string creatorId, string creatorFullName, CompanyMeta companyMeta)
         {
             var companyId = Guid.NewGuid().ToString();
 
@@ -56,19 +57,69 @@ namespace ECommerce.Companies.Infrastructure.Services
 
         }
 
-        public Task<ActionResultResponse<string>> UpdateAsync(string lastUpdateUserId, string lastUpdateFullName, string lastUpdateAvatar, string id, CompanyMeta companyMeta)
+        public async Task<ActionResultResponse<string>> UpdateAsync(string lastUpdateUserId, string lastUpdateFullName, string id, CompanyMeta companyMeta)
         {
-            throw new NotImplementedException();
+            var info = await _companyRepository.GetByIdAsync(id);
+            if (info == null)
+                return new ActionResultResponse<string>(-2, "");
+
+            var checkExistCode = await _companyRepository.CheckExistCodeAsync(info.Id, companyMeta.Code);
+            if (checkExistCode)
+                return new ActionResultResponse<string>(-3, $"[Company] CompanyService: {companyMeta.Code} existed.");
+
+            var checkExistName = await _companyRepository.CheckExistNameAsync(info.Id, companyMeta.Name);
+            if (checkExistName)
+                return new ActionResultResponse<string>(-3, $"[Company] CompanyService: {companyMeta.Name} existed.");
+
+            if (info.ConcurrencyStamp != companyMeta.ConcurrencyStamp)
+                return new ActionResultResponse<string>(-4, "");
+
+            info.Code = companyMeta.Code;
+            info.Name = companyMeta.Name;
+            info.Description = companyMeta.Description;
+            info.IsActive = companyMeta.IsActive;
+            info.ConcurrencyStamp = Guid.NewGuid().ToString();
+            info.LastUpdate = DateTime.Now;
+            info.LastUpdateUserId = lastUpdateUserId;
+            info.LastUpdateFullName = lastUpdateFullName;
+
+            var result = await _companyRepository.UpdateAsync(info);
+            if (result <= 0)
+                return new ActionResultResponse<string>(-1, "");
+            return new ActionResultResponse<string>(1, "");
         }
-        public Task<ActionResultResponse<CompanyDetailViewModel>> GetDetailAsync(string id)
+        public async Task<ActionResultResponse<CompanyDetailViewModel>> GetDetailAsync(string id)
         {
-            throw new NotImplementedException();
+            var info = await _companyRepository.GetByIdAsync(id);
+            if (info == null)
+                return new ActionResultResponse<CompanyDetailViewModel>(-2, "");
+
+            var response = new CompanyDetailViewModel
+            {
+                Id = id,
+                Code = info.Code,
+                Name = info.Name,
+                Description = info.Description,
+                IsActive = info.IsActive
+            };
+
+            return new ActionResultResponse<CompanyDetailViewModel>(code:1, data:response);
         }
 
-        public Task<ActionResultResponse> DeleteAsync(string deleteUserId, string deleteFullName, string deleteAvatar, string id)
+        public async Task<ActionResultResponse> DeleteAsync(string deleteUserId, string deleteFullName, string id)
         {
-            throw new NotImplementedException();
-        }
+            var info = await _companyRepository.GetByIdAsync(id);
+            if (info == null)
+                return new ActionResultResponse(-2, "");
 
+            info.DeleteTime = DateTime.Now;
+            info.DeleteUserId = deleteUserId;
+            info.DeleteFullName = deleteFullName;
+
+            var result = await _companyRepository.DeleteAsync(info);
+            if (result <= 0)
+                return new ActionResultResponse<string>(-1, "");
+            return new ActionResultResponse<string>(1, "");
+        }
     }
 }
