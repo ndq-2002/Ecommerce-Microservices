@@ -205,7 +205,7 @@ namespace ECommerce.Companies.Infrastructure.Repositories
                     await con.OpenAsync();
 
                 var sql = @"
-				SELECT IIF (EXISTS (SELECT 1 FROM Companys WHERE Id != @Id AND Code = @Code AND IsDelete = 0), 1, 0)";
+				SELECT IIF (EXISTS (SELECT 1 FROM Company WHERE Id != @Id AND Code = @Code AND IsDelete = 0), 1, 0)";
 
                 var result = await con.ExecuteScalarAsync<bool>(sql, new { Id = id, Code = code });
                 return result;
@@ -227,7 +227,7 @@ namespace ECommerce.Companies.Infrastructure.Repositories
                     await con.OpenAsync();
 
                 var sql = @"
-				SELECT IIF (EXISTS (SELECT 1 FROM Companys WHERE Id != @Id AND Name = @Name AND IsDelete = 0), 1, 0)";
+				SELECT IIF (EXISTS (SELECT 1 FROM Company WHERE Id != @Id AND Name = @Name AND IsDelete = 0), 1, 0)";
 
                 var result = await con.ExecuteScalarAsync<bool>(sql, new { Id = id, Name = name });
                 return result;
