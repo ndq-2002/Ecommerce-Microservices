@@ -3,6 +3,7 @@ using Ecommerce.Catalog.Domain.IServices;
 using Ecommerce.Catalog.Domain.ModelMetas;
 using Ecommerce.Catalog.Domain.Models;
 using Ecommerce.Catalog.Domain.ViewModels;
+using ECommerce.Infrastructure.Messages.Core;
 using ECommerce.Infrastructure.Models;
 using Microsoft.Extensions.Logging;
 using System;
@@ -31,11 +32,11 @@ namespace ECommerce.Catalog.Infrastructure.Services
 
             var checkExistCode = await _companyRepository.CheckExistCodeAsync(companyId, companyMeta.Code);
             if (checkExistCode)
-                return new ActionResultResponse<string>(-3, $"[Company] CompanyService: {companyMeta.Code} existed.");
+                return new ActionResultResponse<string>(-4, ErrorMessage.GetErrorMessage(ErrorMessage.Exists,companyMeta.Code));
 
             var checkExistName = await _companyRepository.CheckExistNameAsync(companyId, companyMeta.Name);
             if (checkExistName)
-                return new ActionResultResponse<string>(-3, $"[Company] CompanyService: {companyMeta.Name} existed.");
+                return new ActionResultResponse<string>(-4, ErrorMessage.GetErrorMessage(ErrorMessage.Exists, companyMeta.Name));
 
             var company = new Company
             {
@@ -52,8 +53,8 @@ namespace ECommerce.Catalog.Infrastructure.Services
 
             var result = await _companyRepository.InsertAsync(company);
             if (result <= 0)
-                return new ActionResultResponse<string>(-1, "");
-            return new ActionResultResponse<string>(result, "");
+                return new ActionResultResponse<string>(-1, ErrorMessage.SomethingWentWrong);
+            return new ActionResultResponse<string>(result, SuccessMessage.GetSuccessMessage(SuccessMessage.CreateSuccessful,"company"));
 
         }
 
@@ -61,18 +62,18 @@ namespace ECommerce.Catalog.Infrastructure.Services
         {
             var info = await _companyRepository.GetByIdAsync(id);
             if (info == null)
-                return new ActionResultResponse<string>(-2, "");
+                return new ActionResultResponse<string>(-5, ErrorMessage.GetErrorMessage(ErrorMessage.NotExists,"Company"));
 
-            var checkExistCode = await _companyRepository.CheckExistCodeAsync(info.Id, companyMeta.Code);
+            var checkExistCode = await _companyRepository.CheckExistCodeAsync(id, companyMeta.Code);
             if (checkExistCode)
-                return new ActionResultResponse<string>(-3, $"[Company] CompanyService: {companyMeta.Code} existed.");
+                return new ActionResultResponse<string>(-4, ErrorMessage.GetErrorMessage(ErrorMessage.Exists, companyMeta.Code));
 
-            var checkExistName = await _companyRepository.CheckExistNameAsync(info.Id, companyMeta.Name);
+            var checkExistName = await _companyRepository.CheckExistNameAsync(id, companyMeta.Name);
             if (checkExistName)
-                return new ActionResultResponse<string>(-3, $"[Company] CompanyService: {companyMeta.Name} existed.");
+                return new ActionResultResponse<string>(-4, ErrorMessage.GetErrorMessage(ErrorMessage.Exists, companyMeta.Name));
 
             if (info.ConcurrencyStamp != companyMeta.ConcurrencyStamp)
-                return new ActionResultResponse<string>(-4, "");
+                return new ActionResultResponse<string>(-3, ErrorMessage.AlreadyUpdatedByAnother);
 
             info.Code = companyMeta.Code;
             info.Name = companyMeta.Name;
@@ -85,14 +86,14 @@ namespace ECommerce.Catalog.Infrastructure.Services
 
             var result = await _companyRepository.UpdateAsync(info);
             if (result <= 0)
-                return new ActionResultResponse<string>(-1, "");
-            return new ActionResultResponse<string>(1, "");
+                return new ActionResultResponse<string>(-1, ErrorMessage.SomethingWentWrong);
+            return new ActionResultResponse<string>(1, SuccessMessage.GetSuccessMessage(SuccessMessage.UpdateSuccessful,"company"));
         }
         public async Task<ActionResultResponse<CompanyDetailViewModel>> GetDetailAsync(string id)
         {
             var info = await _companyRepository.GetByIdAsync(id);
             if (info == null)
-                return new ActionResultResponse<CompanyDetailViewModel>(-2, "");
+                return new ActionResultResponse<CompanyDetailViewModel>(-5, ErrorMessage.GetErrorMessage(ErrorMessage.NotExists, "Company"));
 
             var response = new CompanyDetailViewModel
             {
@@ -114,7 +115,7 @@ namespace ECommerce.Catalog.Infrastructure.Services
         {
             var info = await _companyRepository.GetByIdAsync(id);
             if (info == null)
-                return new ActionResultResponse(-2, "");
+                return new ActionResultResponse(-5, ErrorMessage.GetErrorMessage(ErrorMessage.NotExists, "Company"));
 
             info.DeleteTime = DateTime.Now;
             info.DeleteUserId = deleteUserId;
@@ -122,8 +123,9 @@ namespace ECommerce.Catalog.Infrastructure.Services
 
             var result = await _companyRepository.DeleteAsync(info);
             if (result <= 0)
-                return new ActionResultResponse<string>(-1, "");
-            return new ActionResultResponse<string>(1, "");
+                if (result <= 0)
+                    return new ActionResultResponse(-1, ErrorMessage.SomethingWentWrong);
+            return new ActionResultResponse(1, SuccessMessage.GetSuccessMessage(SuccessMessage.DeleteSuccessful, "company"));
         }
     }
 }

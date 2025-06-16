@@ -5,6 +5,7 @@ using Ecommerce.Products.Domain.Models;
 using ECommerce.Catalog.Domain.IRepositories;
 using ECommerce.Catalog.Domain.IServices;
 using ECommerce.Catalog.Domain.ViewModels;
+using ECommerce.Infrastructure.Messages.Core;
 using ECommerce.Infrastructure.Models;
 using System;
 using System.Collections.Generic;
@@ -32,7 +33,7 @@ namespace ECommerce.Catalog.Infrastructure.Services
             var productId = Guid.NewGuid().ToString();
             var checkExistName = await _productRepository.CheckExistNameAsync(productId, productMeta.CompanyId, productMeta.Name,productMeta.CategoryId);
             if (checkExistName)
-                return new ActionResultResponse<string>(-3, $"[Product] ProductService: {productMeta.Name} existed.");
+                return new ActionResultResponse<string>(-4, ErrorMessage.GetErrorMessage(ErrorMessage.Exists, productMeta.Name));
 
             var product = new Product
             {
@@ -51,22 +52,25 @@ namespace ECommerce.Catalog.Infrastructure.Services
 
             var result = await _productRepository.InsertAsync(product);
             if (result <= 0)
-                return new ActionResultResponse<string>(-1, "");
-            return new ActionResultResponse<string>(1, "");
+                return new ActionResultResponse<string>(-1, ErrorMessage.SomethingWentWrong);
+            return new ActionResultResponse<string>(result, SuccessMessage.GetSuccessMessage(SuccessMessage.CreateSuccessful, "product"));
         }
 
         public async Task<ActionResultResponse<string>> UpdateAsync(string lastUpdateUserId, string lastUpdateFullName, string id, ProductMeta productMeta)
         {
             var info = await _productRepository.GetByIdAsync(id);
             if (info == null)
-                return new ActionResultResponse<string>(-2, "");
+                return new ActionResultResponse<string>(-5, ErrorMessage.GetErrorMessage(ErrorMessage.NotExists, "Product"));
+
+            if (info.CompanyId != productMeta.CompanyId)
+                return new ActionResultResponse<string>(-2, ErrorMessage.NotHavePermission);
 
             var checkExistName = await _productRepository.CheckExistNameAsync(id, info.CompanyId, productMeta.Name,productMeta.CategoryId);
             if (checkExistName)
-                return new ActionResultResponse<string>(-3, $"[Product] ProductService: {productMeta.Name} existed.");
+                return new ActionResultResponse<string>(-4, ErrorMessage.GetErrorMessage(ErrorMessage.Exists, productMeta.Name));
 
-            if (info.ConcurrencyStamp != productMeta.ConcurrencyStamp || info.CompanyId != productMeta.CompanyId)
-                return new ActionResultResponse<string>(-4, "");
+            if (info.ConcurrencyStamp != productMeta.ConcurrencyStamp)
+                return new ActionResultResponse<string>(-3, ErrorMessage.AlreadyUpdatedByAnother);
 
             info.CompanyId = productMeta.CompanyId;
             info.Name = productMeta.Name;
@@ -80,14 +84,14 @@ namespace ECommerce.Catalog.Infrastructure.Services
 
             var result = await _productRepository.UpdateAsync(info);
             if (result <= 0)
-                return new ActionResultResponse<string>(-1, "");
-            return new ActionResultResponse<string>(1, "");
+                return new ActionResultResponse<string>(-1, ErrorMessage.SomethingWentWrong);
+            return new ActionResultResponse<string>(1, SuccessMessage.GetSuccessMessage(SuccessMessage.UpdateSuccessful, "product"));
         }
         public async Task<ActionResultResponse> DeleteAsync(string deleteUserId, string deleteFullName, string id)
         {
             var info = await _productRepository.GetByIdAsync(id);
             if (info == null)
-                return new ActionResultResponse(-2, "");
+                return new ActionResultResponse(-5, ErrorMessage.GetErrorMessage(ErrorMessage.NotExists, "Product"));
 
             info.DeleteTime = DateTime.Now;
             info.DeleteUserId = deleteUserId;
@@ -95,15 +99,15 @@ namespace ECommerce.Catalog.Infrastructure.Services
 
             var result = await _productRepository.DeleteAsync(info);
             if (result <= 0)
-                return new ActionResultResponse<string>(-1, "");
-            return new ActionResultResponse<string>(1, "");
+                return new ActionResultResponse<string>(-1, ErrorMessage.SomethingWentWrong);
+            return new ActionResultResponse<string>(1, SuccessMessage.GetSuccessMessage(SuccessMessage.DeleteSuccessful, "product"));
         }
 
         public async Task<ActionResultResponse<ProductDetailViewModel>> GetDetailAsync(string id)
         {
             var info = await _productRepository.GetByIdAsync(id);
             if (info == null)
-                return new ActionResultResponse<ProductDetailViewModel>(-2, "");
+                return new ActionResultResponse<ProductDetailViewModel>(-5, ErrorMessage.GetErrorMessage(ErrorMessage.NotExists, "Product"));
 
             var response = new ProductDetailViewModel
             {

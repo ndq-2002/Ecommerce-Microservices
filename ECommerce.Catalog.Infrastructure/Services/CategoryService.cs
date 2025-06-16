@@ -5,6 +5,7 @@ using Ecommerce.Products.Domain.IRepositories;
 using Ecommerce.Products.Domain.Models;
 using ECommerce.Catalog.Domain.IServices;
 using ECommerce.Catalog.Domain.ViewModels;
+using ECommerce.Infrastructure.Messages.Core;
 using ECommerce.Infrastructure.Models;
 using System;
 using System.Collections.Generic;
@@ -31,7 +32,8 @@ namespace ECommerce.Catalog.Infrastructure.Services
             var categoryId = Guid.NewGuid().ToString();
             var checkExistName = await _categoryRepository.CheckExistNameAsync(categoryId,categoryMeta.CompanyId, categoryMeta.Name);
             if (checkExistName)
-                return new ActionResultResponse<string>(-3, $"[Category] CategoryService: {categoryMeta.Name} existed.");
+                return new ActionResultResponse<string>(-4, ErrorMessage.GetErrorMessage(ErrorMessage.Exists, categoryMeta.Name));
+
             var category = new Category
             {
                 Id = categoryId,
@@ -47,22 +49,26 @@ namespace ECommerce.Catalog.Infrastructure.Services
 
             var result = await _categoryRepository.InsertAsync(category);
             if (result <= 0)
-                return new ActionResultResponse<string>(-1, "");
-            return new ActionResultResponse<string>(1, "");
+                return new ActionResultResponse<string>(-1, ErrorMessage.SomethingWentWrong);
+            return new ActionResultResponse<string>(result, SuccessMessage.GetSuccessMessage(SuccessMessage.CreateSuccessful, "category"));
         }
 
         public async Task<ActionResultResponse<string>> UpdateAsync(string lastUpdateUserId, string lastUpdateFullName, string id, CategoryMeta categoryMeta)
         {
             var info = await _categoryRepository.GetByIdAsync(id);
             if (info == null)
-                return new ActionResultResponse<string>(-2, "");
+                return new ActionResultResponse<string>(-5, ErrorMessage.GetErrorMessage(ErrorMessage.NotExists, "Category"));
+
+            if (info.CompanyId != categoryMeta.CompanyId)
+                return new ActionResultResponse<string>(-2, ErrorMessage.NotHavePermission);
 
             var checkExistName = await _categoryRepository.CheckExistNameAsync(info.Id,categoryMeta.CompanyId, categoryMeta.Name);
             if (checkExistName)
-                return new ActionResultResponse<string>(-3, $"{categoryMeta.Name} existed.");
+                return new ActionResultResponse<string>(-4, ErrorMessage.GetErrorMessage(ErrorMessage.Exists, categoryMeta.Name));
 
-            if (info.ConcurrencyStamp != categoryMeta.ConcurrencyStamp || info.CompanyId != categoryMeta.CompanyId)
-                return new ActionResultResponse<string>(-4, "");
+            if (info.ConcurrencyStamp != categoryMeta.ConcurrencyStamp)
+                return new ActionResultResponse<string>(-3, ErrorMessage.AlreadyUpdatedByAnother);
+
 
             info.CompanyId = categoryMeta.CompanyId;
             info.Name = categoryMeta.Name;
@@ -74,30 +80,30 @@ namespace ECommerce.Catalog.Infrastructure.Services
             info.LastUpdateFullName = lastUpdateFullName;
 
             var result = await _categoryRepository.UpdateAsync(info);
-            if(result <= 0)
-                return new ActionResultResponse<string>(-1, "");
-            return new ActionResultResponse<string>(1, "");
+            if (result <= 0)
+                return new ActionResultResponse<string>(-1, ErrorMessage.SomethingWentWrong);
+            return new ActionResultResponse<string>(1, SuccessMessage.GetSuccessMessage(SuccessMessage.UpdateSuccessful, "category"));
         }
         public async Task<ActionResultResponse> DeleteAsync(string deleteUserId, string deleteFullName, string id)
         {
             var info = await _categoryRepository.GetByIdAsync(id);
             if (info == null)
-                return new ActionResultResponse(-2, "");
+                return new ActionResultResponse(-5, ErrorMessage.GetErrorMessage(ErrorMessage.NotExists, "Category"));
 
             info.DeleteTime = DateTime.Now;
             info.DeleteUserId = deleteUserId;
             info.DeleteFullName = deleteFullName;
 
             var result = await _categoryRepository.DeleteAsync(info);
-            if (result <= 0)
-                return new ActionResultResponse<string>(-1, "");
-            return new ActionResultResponse<string>(1, "");
+            if(result <= 0)
+                return new ActionResultResponse<string>(-1, ErrorMessage.SomethingWentWrong);
+            return new ActionResultResponse<string>(1, SuccessMessage.GetSuccessMessage(SuccessMessage.DeleteSuccessful, "category"));
         }
         public async Task<ActionResultResponse<CategoryDetailViewModel>> GetDetailAsync(string id)
         {
             var info = await _categoryRepository.GetByIdAsync(id);
             if (info == null)
-                return new ActionResultResponse<CategoryDetailViewModel>(-2, "");
+                return new ActionResultResponse<CategoryDetailViewModel>(-5, ErrorMessage.GetErrorMessage(ErrorMessage.NotExists, "Category"));
 
             var response = new CategoryDetailViewModel
             {
