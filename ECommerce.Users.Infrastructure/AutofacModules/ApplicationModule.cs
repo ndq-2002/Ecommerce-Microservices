@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Module = Autofac.Module;
 
-namespace Ecommerce.User.Infrastructure.AutofacModules
+namespace Ecommerce.Users.Infrastructure.AutofacModules
 {
     public class ApplicationModule:Module
     {

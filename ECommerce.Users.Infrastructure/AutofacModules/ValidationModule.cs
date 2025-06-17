@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Module = Autofac.Module;
 
-namespace ECommerce.User.Infrastructure.AutofacModules
+namespace ECommerce.Users.Infrastructure.AutofacModules
 {
     public class ValidationModule : Module
     {

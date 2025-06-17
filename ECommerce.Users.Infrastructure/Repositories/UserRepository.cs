@@ -1,4 +1,5 @@
 ﻿using ECommerce.Users.Domain.IRepositories;
+using ECommerce.Users.Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,16 +14,16 @@ namespace ECommerce.Users.Infrastructure.Repositories
         //{
         //    throw new NotImplementedException();
         //}
-        public Task<int> InsertAsync(Domain.Models.User user)
+        public Task<int> InsertAsync(User user)
         {
             throw new NotImplementedException();
         }
 
-        public Task<int> UpdateAsync(Domain.Models.User user)
+        public Task<int> UpdateAsync(User user)
         {
             throw new NotImplementedException();
         }
-        public Task<int> DeleteAsync(Domain.Models.User user)
+        public Task<int> DeleteAsync(User user)
         {
             throw new NotImplementedException();
         }
@@ -32,7 +33,7 @@ namespace ECommerce.Users.Infrastructure.Repositories
             throw new NotImplementedException();
         }
 
-        public Task<Domain.Models.User> GetByIdAsync(string id)
+        public Task<User> GetByIdAsync(string id)
         {
             throw new NotImplementedException();
         }
