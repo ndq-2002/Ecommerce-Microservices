@@ -1,4 +1,5 @@
 ﻿using ECommerce.Users.Domain.Models;
+using ECommerce.Users.Domain.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace ECommerce.Users.Domain.IRepositories
 {
     public interface IUserRepository
     {
-        //Task<List<UserSearchViewModel>> GetAllAsync();
+        Task<List<UserSearchViewModel>> GetAllAsync();
         Task<int> InsertAsync(User user);
         Task<int> UpdateAsync(User user);
         Task<int> DeleteAsync(User user);
