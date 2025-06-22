@@ -57,7 +57,7 @@ namespace ECommerce.Catalog.Infrastructure.Repositories
                     param.Add("@CompanyId", product.CompanyId);
                     param.Add("@Name", product.Name);
                     param.Add("@Description", product.Description);
-                    param.Add("@Description", product.Price);
+                    param.Add("@Price", product.Price);
                     param.Add("@CategoryId", product.CategoryId);
                     param.Add("@IsActive", product.IsActive);
                     param.Add("@IsDelete", product.IsDelete);
@@ -104,7 +104,7 @@ namespace ECommerce.Catalog.Infrastructure.Repositories
                     param.Add("@CompanyId", product.CompanyId);
                     param.Add("@Name", product.Name);
                     param.Add("@Description", product.Description);
-                    param.Add("@Description", product.Price);
+                    param.Add("@Price", product.Price);
                     param.Add("@CategoryId", product.CategoryId);
                     param.Add("@IsActive", product.IsActive);
                     param.Add("@IsDelete", product.IsDelete);

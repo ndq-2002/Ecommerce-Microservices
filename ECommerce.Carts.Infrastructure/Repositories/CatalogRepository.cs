@@ -22,7 +22,7 @@ namespace ECommerce.Carts.Infrastructure.Repositories
             _catalogConnectionString = catalogConnectionString;
         }
 
-        public async Task<List<ProductCatalogViewModel>> GetDetailListPrductsAsync(string id)
+        public async Task<List<ProductCatalogViewModel>> GetDetailListPrductsAsync(string ids)
         {
             try
             {
@@ -31,9 +31,9 @@ namespace ECommerce.Carts.Infrastructure.Repositories
                     await con.OpenAsync();
 
                 DynamicParameters param = new();
-                param.Add("@Ids", id);
+                param.Add("@Ids", ids);
 
-                var results = await con.QueryAsync<ProductCatalogViewModel>("[dbo].[spProduct_GetDetailListPrducts]", commandType: CommandType.StoredProcedure);
+                var results = await con.QueryAsync<ProductCatalogViewModel>("[dbo].[spProduct_GetDetailListPrducts]",param, commandType: CommandType.StoredProcedure);
                 return results.ToList();
             }
             catch (Exception ex)
