@@ -10,7 +10,7 @@ namespace ECommerce.Carts.Domain.IServices
     public interface IRedisCartService
     {
         Task<List<CartItemMeta>> GetCartItemsAsync(string userId);
-        Task SetCartAsync(string userId, List<CartItemMeta> items);
-        Task ClearCartAsync(string userId);
+        Task<bool> SetCartAsync(string userId, List<CartItemMeta> items);
+        Task<bool> ClearCartAsync(string userId);
     }
 }

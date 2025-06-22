@@ -9,6 +9,6 @@ namespace ECommerce.Carts.Domain.IRepositories
 {
     public interface ICatalogRepository
     {
-        Task<List<ProductCatalogViewModel>> GetDetailListPrductsAsync(string id);
+        Task<List<ProductCatalogViewModel>> GetDetailListPrductsAsync(string ids);
     }
 }

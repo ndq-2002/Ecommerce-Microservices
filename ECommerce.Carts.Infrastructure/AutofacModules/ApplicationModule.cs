@@ -1,4 +1,9 @@
 ﻿using Autofac;
+using ECommerce.Carts.Domain.IRepositories;
+using ECommerce.Carts.Infrastructure.Repositories;
+using ECommerce.Carts.Infrastructure.Services;
+using Microsoft.Extensions.Configuration;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,21 +16,19 @@ namespace Ecommerce.Carts.Infrastructure.AutofacModules
 {
     public class ApplicationModule:Module
     {
-        public string _connectionString { get; }
         public string _catalogConnectionString { get; set; }
-        public ApplicationModule(string connectionString, string catalogConnectionString)
-        {
-            _connectionString = connectionString;        
+        public ApplicationModule(string catalogConnectionString)
+        {      
             _catalogConnectionString = catalogConnectionString;
         }
 
         protected override void Load(ContainerBuilder builder)
         {
             var assembly = Assembly.GetExecutingAssembly();
-            builder.RegisterAssemblyTypes(assembly)
-               .Where(t => t.Name.EndsWith("Repository"))
-              .AsImplementedInterfaces()
-              .WithParameter(new TypedParameter(typeof(string), _connectionString));
+            //builder.RegisterAssemblyTypes(assembly)
+            //   .Where(t => t.Name.EndsWith("Repository"))
+            //  .AsImplementedInterfaces()
+            //  .WithParameter(new TypedParameter(typeof(string), _connectionString));
 
             builder.RegisterAssemblyTypes(assembly)
                 .Where(t => t.Name.EndsWith("Service"))
@@ -35,6 +38,7 @@ namespace Ecommerce.Carts.Infrastructure.AutofacModules
                    .As<ICatalogRepository>()
                    .InstancePerLifetimeScope()
                    .WithParameter(new TypedParameter(typeof(string), _catalogConnectionString));
+
         }
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ECommerce.Carts.Domain.ViewModel
 {
-    public class CartViewModel
+    public class CartDetailViewModel
     {
         public string ProductId { get; set; }
         public string ProductName { get; set; }

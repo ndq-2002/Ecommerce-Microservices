@@ -13,9 +13,11 @@ namespace ECommerce.Carts.Infrastructure.Services
     public class RedisCartService : IRedisCartService
     {
         private readonly IDatabase _redisService;
-        public RedisCartService(IConnectionMultiplexer redisService)
+        private readonly TimeSpan _expireTime;
+        public RedisCartService(IConnectionMultiplexer redisService,TimeSpan expireTime)
         {
             _redisService = redisService.GetDatabase();
+            _expireTime = expireTime;
         }
 
         public async Task<List<CartItemMeta>> GetCartItemsAsync(string userId)
@@ -26,12 +28,13 @@ namespace ECommerce.Carts.Infrastructure.Services
                 : JsonSerializer.Deserialize<List<CartItemMeta>>(json)!;
         }
 
-        public async Task SetCartAsync(string userId, List<CartItemMeta> items)
+        public async Task<bool> SetCartAsync(string userId, List<CartItemMeta> items)
         {
             var json = JsonSerializer.Serialize(items);
-            await _redisService.StringSetAsync(GetKey(userId), json);
+            var result = await _redisService.StringSetAsync(GetKey(userId), json,_expireTime);
+            return result;
         }
-        public async Task ClearCartAsync(string userId) => await _redisService.KeyDeleteAsync(GetKey(userId));
+        public async Task<bool> ClearCartAsync(string userId) => await _redisService.KeyDeleteAsync(GetKey(userId));
 
         private string GetKey(string userId) => $"cart:{userId}";
     }
