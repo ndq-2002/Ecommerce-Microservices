@@ -7,6 +7,7 @@ using ECommerce.Infrastructure.Messages.Core;
 using ECommerce.Infrastructure.Models;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -73,9 +74,13 @@ namespace ECommerce.Carts.Infrastructure.Services
                 return new ActionResultResponse<string>(-1, ErrorMessage.SomethingWentWrong);
             return new ActionResultResponse<string>(1, SuccessMessage.GetSuccessMessage(SuccessMessage.DeleteSuccessful, "item"));
         }
-        public Task<ActionResultResponse<string>> CheckoutAsync(string userId)
+        public async Task<ActionResultResponse<string>> CheckoutAsync(string userId)
         {
-            throw new NotImplementedException();
+            //DataTable dt = new();
+            //dt.Columns.Add("ProductId", typeof(string));
+            //dt.Columns.Add("Quantity", typeof(int));
+            return new ActionResultResponse<string>(1, SuccessMessage.GetSuccessMessage(SuccessMessage.CreateSuccessful, "order"));
+
         }
 
         public async Task<ActionResultResponse> ClearCartAsync(string userId)

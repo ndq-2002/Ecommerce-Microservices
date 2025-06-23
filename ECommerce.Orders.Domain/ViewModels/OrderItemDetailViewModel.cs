@@ -4,13 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ECommerce.Carts.Domain.Models
+namespace ECommerce.Orders.Domain.ViewModels
 {
-    public class CartItem
+    public class OrderItemDetailViewModel
     {
-        public string Id { get; set; }
-        public string OrderId { get; set; }
         public string ProductId { get; set; }
+        public string ProductName { get; set; }
         public decimal Price { get; set; }
         public int Quantity { get; set; }
     }
