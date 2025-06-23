@@ -8,6 +8,13 @@
 
   <ItemGroup>
     <PackageReference Include="Autofac" Version="8.3.0" />
+    <PackageReference Include="Dapper" Version="2.1.66" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ECommerce.Orders.Domain\ECommerce.Orders.Domain.csproj" />
   </ItemGroup>
 
 </Project>
