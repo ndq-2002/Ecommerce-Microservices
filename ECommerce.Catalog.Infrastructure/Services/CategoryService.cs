@@ -50,7 +50,7 @@ namespace ECommerce.Catalog.Infrastructure.Services
             var result = await _categoryRepository.InsertAsync(category);
             if (result <= 0)
                 return new ActionResultResponse<string>(-1, ErrorMessage.SomethingWentWrong);
-            return new ActionResultResponse<string>(result, SuccessMessage.GetSuccessMessage(SuccessMessage.CreateSuccessful, "category"));
+            return new ActionResultResponse<string>(result, SuccessMessage.GetSuccessMessage(SuccessMessage.CreateSuccessful, "category"),null,categoryId);
         }
 
         public async Task<ActionResultResponse<string>> UpdateAsync(string lastUpdateUserId, string lastUpdateFullName, string id, CategoryMeta categoryMeta)
@@ -82,7 +82,7 @@ namespace ECommerce.Catalog.Infrastructure.Services
             var result = await _categoryRepository.UpdateAsync(info);
             if (result <= 0)
                 return new ActionResultResponse<string>(-1, ErrorMessage.SomethingWentWrong);
-            return new ActionResultResponse<string>(1, SuccessMessage.GetSuccessMessage(SuccessMessage.UpdateSuccessful, "category"));
+            return new ActionResultResponse<string>(1, SuccessMessage.GetSuccessMessage(SuccessMessage.UpdateSuccessful, "category"),null, id);
         }
         public async Task<ActionResultResponse> DeleteAsync(string deleteUserId, string deleteFullName, string id)
         {
@@ -97,7 +97,7 @@ namespace ECommerce.Catalog.Infrastructure.Services
             var result = await _categoryRepository.DeleteAsync(info);
             if(result <= 0)
                 return new ActionResultResponse<string>(-1, ErrorMessage.SomethingWentWrong);
-            return new ActionResultResponse<string>(1, SuccessMessage.GetSuccessMessage(SuccessMessage.DeleteSuccessful, "category"));
+            return new ActionResultResponse<string>(1, SuccessMessage.GetSuccessMessage(SuccessMessage.DeleteSuccessful, "category"),null,id);
         }
         public async Task<ActionResultResponse<CategoryDetailViewModel>> GetDetailAsync(string id)
         {

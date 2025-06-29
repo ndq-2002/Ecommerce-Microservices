@@ -1,6 +1,6 @@
-﻿using ECommerce.Infrastructure.Messages.Core;
+﻿using ECommerce.Infrastructure.Constants;
+using ECommerce.Infrastructure.Messages.Core;
 using ECommerce.Infrastructure.Models;
-using ECommerce.Orders.Domain.Constants;
 using ECommerce.Orders.Domain.IRepositories;
 using ECommerce.Orders.Domain.IServices;
 using ECommerce.Orders.Domain.ViewModels;

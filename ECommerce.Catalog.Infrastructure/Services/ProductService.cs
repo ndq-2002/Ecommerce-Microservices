@@ -53,7 +53,7 @@ namespace ECommerce.Catalog.Infrastructure.Services
             var result = await _productRepository.InsertAsync(product);
             if (result <= 0)
                 return new ActionResultResponse<string>(-1, ErrorMessage.SomethingWentWrong);
-            return new ActionResultResponse<string>(result, SuccessMessage.GetSuccessMessage(SuccessMessage.CreateSuccessful, "product"));
+            return new ActionResultResponse<string>(result, SuccessMessage.GetSuccessMessage(SuccessMessage.CreateSuccessful, "product"),null,productId);
         }
 
         public async Task<ActionResultResponse<string>> UpdateAsync(string lastUpdateUserId, string lastUpdateFullName, string id, ProductMeta productMeta)
@@ -85,7 +85,7 @@ namespace ECommerce.Catalog.Infrastructure.Services
             var result = await _productRepository.UpdateAsync(info);
             if (result <= 0)
                 return new ActionResultResponse<string>(-1, ErrorMessage.SomethingWentWrong);
-            return new ActionResultResponse<string>(1, SuccessMessage.GetSuccessMessage(SuccessMessage.UpdateSuccessful, "product"));
+            return new ActionResultResponse<string>(1, SuccessMessage.GetSuccessMessage(SuccessMessage.UpdateSuccessful, "product"),null,id);
         }
         public async Task<ActionResultResponse> DeleteAsync(string deleteUserId, string deleteFullName, string id)
         {
@@ -100,7 +100,7 @@ namespace ECommerce.Catalog.Infrastructure.Services
             var result = await _productRepository.DeleteAsync(info);
             if (result <= 0)
                 return new ActionResultResponse<string>(-1, ErrorMessage.SomethingWentWrong);
-            return new ActionResultResponse<string>(1, SuccessMessage.GetSuccessMessage(SuccessMessage.DeleteSuccessful, "product"));
+            return new ActionResultResponse<string>(1, SuccessMessage.GetSuccessMessage(SuccessMessage.DeleteSuccessful, "product"),null,id);
         }
 
         public async Task<ActionResultResponse<ProductDetailViewModel>> GetDetailAsync(string id)

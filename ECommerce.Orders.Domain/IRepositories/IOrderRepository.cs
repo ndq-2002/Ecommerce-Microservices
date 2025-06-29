@@ -1,4 +1,4 @@
-﻿using ECommerce.Orders.Domain.Constants;
+﻿using ECommerce.Infrastructure.Constants;
 using ECommerce.Orders.Domain.Models;
 using ECommerce.Orders.Domain.ViewModels;
 using System;

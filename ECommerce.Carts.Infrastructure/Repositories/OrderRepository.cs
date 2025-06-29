@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using ECommerce.Carts.Domain.IRepositories;
+using ECommerce.Carts.Domain.Models;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using System;
@@ -20,7 +21,7 @@ namespace ECommerce.Carts.Infrastructure.Repositories
             _orderConnectionString = orderConnectionString;
             _logger = logger;
         }
-        public async Task<string> CreateOrderByTableTypeAsync(string userId, DataTable dt)
+        public async Task<int> CreateOrderByTableTypeAsync(OrderClient order, DataTable dt)
         {
             try
             {
@@ -29,16 +30,23 @@ namespace ECommerce.Carts.Infrastructure.Repositories
                     await con.OpenAsync();
 
                 var param = new DynamicParameters();
-                param.Add("@UserId",userId);
+                param.Add("Id", order.Id);
+                param.Add("@UserId",order.UserId);
+                param.Add("@OrderDate", order.OrderDate);
+                param.Add("@CreateTime", order.CreateTime);
+                if (order.LastUpdate != null && order.LastUpdate != DateTime.MinValue)
+                {
+                    param.Add("@LastUpdate", order.LastUpdate);
+                }
                 // Tạo SqlParameter cho Table-Valued Parameter
                 param.Add("@List", dt.AsTableValuedParameter("dbo.OrderType"));
-                var result = await con.QueryFirstOrDefaultAsync<string>("[dbo].[spOrder_InsertByTableType]", param, commandType: CommandType.StoredProcedure);
+                var result = await con.ExecuteAsync("[dbo].[spOrder_InsertByTableType]", param, commandType: CommandType.StoredProcedure);
                 return result;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "[dbo].[spOrder_InsertByTableType] OrderRepository InsertByTableTypeAsync Error.");
-                return null;
+                return -1;
             }
         }
     }
