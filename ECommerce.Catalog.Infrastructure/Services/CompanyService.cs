@@ -54,7 +54,7 @@ namespace ECommerce.Catalog.Infrastructure.Services
             var result = await _companyRepository.InsertAsync(company);
             if (result <= 0)
                 return new ActionResultResponse<string>(-1, ErrorMessage.SomethingWentWrong);
-            return new ActionResultResponse<string>(result, SuccessMessage.GetSuccessMessage(SuccessMessage.CreateSuccessful,"company"));
+            return new ActionResultResponse<string>(result, SuccessMessage.GetSuccessMessage(SuccessMessage.CreateSuccessful,"company"),null,companyId);
 
         }
 
@@ -87,7 +87,7 @@ namespace ECommerce.Catalog.Infrastructure.Services
             var result = await _companyRepository.UpdateAsync(info);
             if (result <= 0)
                 return new ActionResultResponse<string>(-1, ErrorMessage.SomethingWentWrong);
-            return new ActionResultResponse<string>(1, SuccessMessage.GetSuccessMessage(SuccessMessage.UpdateSuccessful,"company"));
+            return new ActionResultResponse<string>(1, SuccessMessage.GetSuccessMessage(SuccessMessage.UpdateSuccessful,"company"),null,id);
         }
         public async Task<ActionResultResponse<CompanyDetailViewModel>> GetDetailAsync(string id)
         {

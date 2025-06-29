@@ -11,7 +11,7 @@ namespace ECommerce.Carts.Domain.IServices
 {
     public interface ICartService
     {
-        Task<List<CartDetailViewModel>> GetCartWithDetailsAsync(string userId);
+        Task<List<CartDetailViewModel>> GetCartAsync(string userId);
         Task<ActionResultResponse<string>> InsertCartAsync(string userId, CartItemMeta cartItemMeta);
         Task<ActionResultResponse<string>> UpdateCartAsync(string userId, CartItemMeta cartItemMeta);
         Task<ActionResultResponse> RemoveItemInCartAsync(string userId,string productId);

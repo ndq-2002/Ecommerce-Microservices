@@ -25,7 +25,7 @@ namespace ECommerce.Carts.Api.Controllers
         [Route("get-detail/{userId}"), AcceptVerbs("GET")]
         public async Task<IActionResult> GetCart(string userId)
         {
-            var cart = await _cartService.GetCartWithDetailsAsync(userId);
+            var cart = await _cartService.GetCartAsync(userId);
             return Ok(cart);
         }
 
@@ -76,6 +76,19 @@ namespace ECommerce.Carts.Api.Controllers
             if (result.Code <= 0)
             {
                 _logger.LogError("[Cart] CartController ClearCartAsync error.");
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+        [SwaggerOperation(Summary = "Checkout Cart", Description = "Requires login verification!", OperationId = "CheckoutCart", Tags = new[] { "Cart" })]
+        [Route("checkout/{userId}"), AcceptVerbs("POST")]
+        public async Task<IActionResult> CheckoutCart(string userId)
+        {
+            var result = await _cartService.CheckoutAsync(userId);
+            if (result.Code <= 0)
+            {
+                _logger.LogError("[Cart] CartController CheckoutCartAsync error.");
                 return BadRequest(result);
             }
             return Ok(result);

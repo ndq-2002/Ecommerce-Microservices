@@ -1,8 +1,10 @@
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Ecommerce.Carts.Infrastructure.AutofacModules;
+using ECommerce.Carts.Domain.IServices;
 using ECommerce.Carts.Infrastructure.AutofacModules;
 using ECommerce.Carts.Infrastructure.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using StackExchange.Redis;
 
@@ -15,7 +17,7 @@ Log.Logger = new LoggerConfiguration()
 
 // Config Autofac
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
-builder.Host.ConfigureContainer<ContainerBuilder>(builder => builder.RegisterModule(new ApplicationModule(configuration.GetConnectionString("CatalogConnectionString"))));
+builder.Host.ConfigureContainer<ContainerBuilder>(builder => builder.RegisterModule(new ApplicationModule(configuration.GetConnectionString("CatalogConnectionString"), configuration.GetConnectionString("OrderConnectionString"))));
 builder.Host.ConfigureContainer<ContainerBuilder>(builder => builder.RegisterModule(new ValidationModule()));
 // Add services to the container.
 
@@ -27,13 +29,6 @@ var redisPort = configuration["Redis:Port"];
 var redisConnection = $"{redisHost}:{redisPort}";
 builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnection));
 
-// RedisCartService config with TTL
-builder.Services.AddSingleton<RedisCartService>(sp =>
-{
-    var redis = sp.GetRequiredService<IConnectionMultiplexer>();
-    var ttlMinutes = int.Parse(configuration["Cart:ExpireMinutes"] ?? "1440");
-    return new RedisCartService(redis, TimeSpan.FromMinutes(ttlMinutes));
-});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Host.UseSerilog();
 builder.Services.AddEndpointsApiExplorer();

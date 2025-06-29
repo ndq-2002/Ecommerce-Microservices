@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using ECommerce.Carts.Domain.IRepositories;
+using ECommerce.Carts.Domain.IServices;
 using ECommerce.Carts.Infrastructure.Repositories;
 using ECommerce.Carts.Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
@@ -16,10 +17,12 @@ namespace Ecommerce.Carts.Infrastructure.AutofacModules
 {
     public class ApplicationModule:Module
     {
-        public string _catalogConnectionString { get; set; }
-        public ApplicationModule(string catalogConnectionString)
+        public string _catalogConnectionString { get; }
+        public string _orderConnectionString { get; }
+        public ApplicationModule(string catalogConnectionString,string orderConnectionString)
         {      
             _catalogConnectionString = catalogConnectionString;
+            _orderConnectionString = orderConnectionString;
         }
 
         protected override void Load(ContainerBuilder builder)
@@ -39,6 +42,19 @@ namespace Ecommerce.Carts.Infrastructure.AutofacModules
                    .InstancePerLifetimeScope()
                    .WithParameter(new TypedParameter(typeof(string), _catalogConnectionString));
 
+            builder.RegisterType<OrderRepository>()
+                   .As<IOrderRepository>()
+                   .InstancePerLifetimeScope()
+                   .WithParameter(new TypedParameter(typeof(string), _orderConnectionString));
+
+            builder.Register(c =>
+            {
+                var config = c.Resolve<IConfiguration>();
+                var redis = c.Resolve<IConnectionMultiplexer>();
+                var expireMinutes = config.GetValue<int>("Cart:ExpireMinutes");
+
+                return new RedisCartService(redis, TimeSpan.FromMinutes(expireMinutes));
+            }).As<IRedisCartService>().InstancePerLifetimeScope();
         }
     }
 }
